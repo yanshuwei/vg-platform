@@ -7,7 +7,7 @@
 /vg-server/target
 /vg-service/target
 *.iml
-#/*.gitignore
+/*.gitignore
 /vg-domain/*.iml
 /vg-netty/vg-netty-scadaserver/*.iml
 /vg-framework/vg-framework.iml
