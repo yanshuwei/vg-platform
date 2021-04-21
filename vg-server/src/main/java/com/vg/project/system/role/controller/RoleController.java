@@ -6,7 +6,6 @@ import com.vg.framework.web.controller.BaseController;
 import com.vg.framework.web.domain.AjaxResult;
 import com.vg.framework.web.page.TableDataInfo;
 import com.vg.project.shiro.util.ShiroUtils;
-import com.vg.project.system.email.service.ISendEmailService;
 import com.vg.project.system.role.domain.Role;
 import com.vg.project.system.role.domain.RoleOrganization;
 import com.vg.project.system.role.service.IRoleOrganizationService;
@@ -39,8 +38,6 @@ public class RoleController extends BaseController
     private IRoleService roleService;
     @Autowired
 	IRoleOrganizationService roleOrganizationService;
-    @Autowired
-	ISendEmailService sendEmailService;
 
     @RequiresPermissions("system:role:view")
     @GetMapping()

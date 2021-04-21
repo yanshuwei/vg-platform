@@ -2,7 +2,6 @@ package com.vg.project.system.user.service;
 
 import com.vg.common.constant.UserConstants;
 import com.vg.common.support.Convert;
-import com.vg.common.utils.EmailUtil;
 import com.vg.common.utils.StringUtils;
 import com.vg.project.shiro.service.PasswordService;
 import com.vg.project.shiro.util.ShiroUtils;
@@ -52,10 +51,6 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserDeptMapper userDeptMapper;
-    @Autowired
-    private EmailUtil emailUtil;
-    @Value("${spring.mail.username}")
-    private String sender;
 
 
     /**
@@ -175,18 +170,6 @@ public class UserServiceImpl implements IUserService {
         insertUserRole(user);
         // 新增用户部门关联
         insertUserDept(user);
-        if (rows > 0) {
-            for (Long roleId : user.getRoleIds()) {
-                content = content + roleMapper.selectRoleById(roleId).getRoleName() + ",";
-            }
-            content = content + "</p><p style=\"text-indent:2em;\">为了您的账号安全，请登录后重置密码！</p>" + "<p style=\"text-indent:2em;\">点击链接:<a href=\"https://yun.ginfon.cn\">https://yun.ginfon.cn</a>访问金峰云</p>"
-                    + "<hr style=\"height:1px;border:none;border-top:1px solid #555555;\" /> \n" +
-                    "<b>此邮件为系统邮件，请勿直接回复！</b>\n" +
-                    "</body>\n" +
-                    "</html>";
-            emailUtil.sendHtmlMail(sender, user.getEmail(), "金峰云账号开通通知", content);
-        }
-
         return rows;
     }
 
@@ -214,19 +197,7 @@ public class UserServiceImpl implements IUserService {
         userPostMapper.deleteUserPostByUserId(userId);
         // 新增用户与岗位管理
         insertUserPost(user);
-        int rows = userMapper.updateUser(user);
-        if (rows > 0) {
-            String content = "<html><body>" + user.getUserName() + "，您好!<p style=\"text-indent:2em;\">您的金峰云账号角色发生改变，当前角色为：";
-            for (Long roleId : user.getRoleIds()) {
-                content = content + roleMapper.selectRoleById(roleId).getRoleName() + "&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-            content = content + "</p>" + "<hr style=\"height:1px;border:none;border-top:1px solid #555555;\" /> \n" +
-                    "<b>此邮件为系统邮件，请勿直接回复！</b>\n" +
-                    "</body>\n" +
-                    "</html>";
-            emailUtil.sendHtmlMail(sender, user.getEmail(), "金峰云账号变动通知", content);
-        }
-        return rows;
+        return userMapper.updateUser(user);
     }
 
     /**
@@ -252,15 +223,7 @@ public class UserServiceImpl implements IUserService {
                 user.getUserName() + "，您好！</div><div style=\"font-size:14px;margin-top:10px;text-indent:2em;\">您的金峰云登录账号为：" + user.getLoginName() + "  登录密码已重置为：" + user.getPassword() + "   为了您的账号安全，请登录后重新设置密码。</div>";
         user.randomSalt();
         user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
-        int rows = updateUserInfo(user);
-        if (rows > 0) {
-            content += "<div style=\"font-size:14px;margin-top:20px;text-indent:2em;\">点击链接 <a href=\"https://yun.ginfon.cn\" title=\"金峰云\">https://yun.ginfon.cn</a> 进入金峰云 ......</div>";
-            content += "<hr/>";
-            content += "<div>此邮件为系统邮件，请勿直接回复！</div>";
-            content += "</body></html>";
-            emailUtil.sendHtmlMail(sender, user.getEmail(), "金峰云账号密码变更提醒", content);
-        }
-        return rows;
+        return updateUserInfo(user);
     }
 
     /**
