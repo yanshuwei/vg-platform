@@ -50,9 +50,9 @@ public class IndexController extends BaseController {
         List<Menu> menus = menuService.selectMenusByUserId(user.getUserId());
         // 根据权限字符串添加自定义菜单
         StringBuilder perms = new StringBuilder();
-        if("Platform".equals(user.getUserType())){
+        /*if("Platform".equals(user.getUserType())){
             perms.append("system:manhourStatistics:myhour");
-        }
+        }*/
         List<Menu> diyMenus = menuService.selectMenusByPerms(perms.toString());
         diyMenus.stream().sequential().collect(Collectors.toCollection(() -> menus));
         List<Menu> finalMenus = menus;

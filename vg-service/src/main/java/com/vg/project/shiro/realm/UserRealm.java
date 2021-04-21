@@ -51,9 +51,9 @@ public class UserRealm extends AuthorizingRealm
         // 权限加入AuthorizationInfo认证对象
         Set<String> perms = menuService.selectPermsByUserId(userId);
         // 添加自定义权限字符串
-        if("Platform".equals(user.getUserType())){
+        /*if("Platform".equals(user.getUserType())){
             perms.add("system:manhourStatistics:myhour");
-        }
+        }*/
         info.setStringPermissions(perms);
         return info;
     }
