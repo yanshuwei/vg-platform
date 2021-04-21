@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<title th:text="${name + ' - 首页'}"></title>
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet"/>
+<script th:src="@{/js/stomp.min.js}"></script>
+<script th:src="@{/js/sockjs.min.js}"></script>
+<script type="text/javascript" th:src='@{/js/echarts.min.js}'></script>
+<script type="text/javascript" th:src='@{/js/jquery.min.js}'></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript">
+    var id = '[[${id}]]';
+    var type = '[[${type}]]';
+    var aliasName = '[[${aliasName}]]';
+    var scadaServer = '[[${scadaServer}]]';
+    var monitorServer = '[[${monitorServer}]]';
+    var workStatusUrl = '[[${workStatusUrl}]]';
+    var crossBeltScadaUrl = '[[${crossBeltScadaUrl}]]';
+    var sortingEfficiencyUrl = '[[${sortingEfficiencyUrl}]]';
+    var serverPerformanceUrl = '[[${serverPerformanceUrl}]]';
+    var sealmailInductionStatisticsUrl = '[[${sealmailInductionStatisticsUrl}]]';
+    var userName =  '[[${userName}]]';
+</script>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <nav th:include="system/monitor/include :: navigation"></nav>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>班次信息</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        <a class="close-link"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="sortTotalNum" class="text-center text-info"></div>
+                    <div class="text-center text-info" id="workTime"></div>
+                </div>
+                <div class="ibox-content" style="background-color: #f1f1f1;">
+                    <div id="workEfficiency" style="height:178px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>分拣效率</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="ibox-content" id="SortingEfficiency" style="width:100%; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="crossbelt_efficiency">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>供包台分拣效率</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="ibox-content" style="background-color:#f1f1f1;padding-bottom: 0px;">
+                    <div id="InductionStatistics" style="width:100%; height: 400px;margin-bottom: 15px;"></div>
+                    <div>
+                        <table class="table" border-width="0 0 1px 0" border-style="solid" border-color="black"
+                               style="display: none;">
+                            <thead>
+                            <tr>
+                                <th>供件台号</th>
+                                <th>总货件</th>
+                                <th>正常货件</th>
+                                <th>异常货件</th>
+                                <th>未分配滑槽1</th>
+                                <th>最大再循环2</th>
+                                <th>锁格3</th>
+                                <th>多条码4</th>
+                                <th>无目的地信息5</th>
+                                <th>无读6</th>
+                                <th>VCS操作延时7</th>
+                                <th>VCS排队超时8</th>
+                                <th>VCS补码拒绝9</th>
+                                <th>条码拒绝10</th>
+                                <th>MES拒绝11</th>
+                                <th>补码关闭12</th>
+                                <th>重复分拣13</th>
+                            </tr>
+                            </thead>
+                            <tbody id="InductionStatisticsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>服务器性能</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link" id="per_gauge">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content" id="gauge" style="height: 300px;padding:0px;">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>设备监控</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        <a class="close-link"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="ibox-content" id="device-monitor" style="height:300px;padding:0px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+<script>
+    $(".modal").appendTo("body"), $("[data-toggle=popover]").popover(), $(".collapse-link").click(function () {
+        var div_ibox = $(this).closest("div.ibox"),
+            e = $(this).find("i"),
+            i = div_ibox.find("div.ibox-content");
+        i.slideToggle(200),
+            e.toggleClass("fa-chevron-up").toggleClass("fa-chevron-down"),
+            div_ibox.toggleClass("").toggleClass("border-bottom"),
+            setTimeout(function () {
+                div_ibox.resize();
+            }, 50);
+    }), $(".close-link").click(function () {
+        var div_ibox = $(this).closest("div.ibox");
+        div_ibox.remove()
+    });
+</script>
+<script th:src="@{/monitor/index.js}"></script>
+<script th:src="@{/monitor/index_scada.js}"></script>
+</body>
+</html>

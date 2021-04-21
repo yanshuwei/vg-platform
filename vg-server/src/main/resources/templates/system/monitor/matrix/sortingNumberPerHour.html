@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.css}" rel="stylesheet"/>
+    <link th:href="@{/css/animate.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <link th:href="@{/ruoyi/css/ry-ui.min.css}" rel="stylesheet"/>
+
+    <script th:src="@{/monitor/base-loading.js}"></script>
+    <script type="text/javascript" th:src='@{/js/jquery.min.js}'></script>
+    <script th:src="@{/js/stomp.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/sockjs.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src='@{/js/echarts.min.js}'></script>
+    <script th:src="@{/monitor/matrix/sortingNumberPerHour.js}"></script>
+    <script type="text/javascript">
+        var monitorServer = '[[${monitorServer}]]';
+        var aliasName = '[[${aliasName}]]';
+        var matrixSortingNumPerHourUrl = '[[${matrixSortingNumPerHourUrl}]]';
+        var userName =  '[[${userName}]]'
+    </script>
+    <title>分拣线小时分拣量</title>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-12">
+        <div class="row">
+            <nav th:include="system/monitor/include :: navigation"></nav>
+        </div>
+        <div class="row pull-right" style="margin-top:20px;">
+            <div class="col-md-12">
+                <input type="checkbox" name="noHis" id="noHis"
+                       style="width:25px;vertical-align:middle;margin:0px;" checked="checked"
+                       onchange="loaddata();"/>只查询当前班次
+                <a style="margin-left:50px;" class="text-success" onclick="toimage()" id="toimage" href="#">效率图表</a>
+                <a href="#" style="margin-left:50px;" class="text-success" onclick="returntable()"
+                   id="returntable">列表显示</a>
+            </div>
+        </div>
+        <div class="row" id="table_data">
+            <div class="col-md-12 select-table table-striped">
+                <table id="conversation" class="table table-striped" border-width="0 0 1px 0"
+                       border-style="solid" border-color="black">
+                    <thead id="throughputHead"></thead>
+                    <tbody id="throughputBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row" id="image_data">
+            <div class="col-md-12">
+                <div id="main" style="height: 500px;width: 100%;margin-top:20px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+</body>
+</html>

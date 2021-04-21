@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <script th:src="@{/monitor/base-loading.js}"></script>
+</head>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+<link href="/css/bootstrap.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<link href="/main.css" rel="stylesheet">
+<script src="/js/stomp.min.js"></script>
+<script src="/js/jquery.min.js?v=2.1.4"></script>
+<script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script type="text/javascript" th:src="@{/ajax/libs/layer/laydate/laydate.js}"></script>
+<script th:inline="javascript">
+    var id = [[${id}]];
+</script>
+<script th:src="@{/monitor/sealmailStatistics.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        //每页显示的数目
+        var show_per_page = 5;
+        //获取content对象里面，数据的数量
+        var number_of_items = $('#content').children().size();
+        //计算页面显示的数量
+        var number_of_pages = Math.ceil(number_of_items/show_per_page);
+
+        //隐藏域默认值
+        $('#current_page').val(0);
+        $('#show_per_page').val(show_per_page);
+
+        var navigation_html = '<a class="previous_link" href="javascript:previous();">上一页</a>';
+        var current_link = 0;
+        while(number_of_pages > current_link){
+            navigation_html += '<a class="page_link" href="javascript:go_to_page(' + current_link +')" longdesc="' + current_link +'">'+ (current_link + 1) +'</a>';
+            current_link++;
+        }
+        navigation_html += '<a class="next_link" href="javascript:next();">下一页</a>';
+
+        $('#page_navigation').html(navigation_html);
+
+        //add active_page class to the first page link
+        $('#page_navigation .page_link:first').addClass('active_page');
+
+        //隐藏该对象下面的所有子元素
+        $('#content').children().css('display', 'none');
+
+        //显示第n（show_per_page）元素
+        $('#content').children().slice(0, show_per_page).css('display', 'block');
+
+    });
+
+    //上一页
+    function previous(){
+        var new_page = parseInt($('#current_page').val()) - 1;
+        //if there is an item before the current active link run the function
+        if($('.active_page').prev('.page_link').length==true){
+            go_to_page(new_page);
+        }
+
+    }
+    //下一页
+    function next(){
+        var new_page = parseInt($('#current_page').val()) + 1;
+        //if there is an item after the current active link run the function
+        if($('.active_page').next('.page_link').length==true){
+            go_to_page(new_page);
+        }
+
+    }
+    //跳转某一页
+    function go_to_page(page_num){
+        //get the number of items shown per page
+        var show_per_page = parseInt($('#show_per_page').val());
+
+        //get the element number where to start the slice from
+        var start_from = page_num * show_per_page;
+
+        //get the element number where to end the slice
+        var end_on = start_from + show_per_page;
+
+        //hide all children elements of content div, get specific items and show them
+        $('#content').children().css('display', 'none').slice(start_from, end_on).css('display', 'block');
+
+        /*get the page link that has longdesc attribute of the current page and add active_page class to it
+        and remove that class from previously active page link*/
+        $('.page_link[longdesc=' + page_num +']').addClass('active_page').siblings('.active_page').removeClass('active_page');
+
+        //update the current page input field
+        $('#current_page').val(page_num);
+    }
+
+</script>
+<style>
+    #page_navigation a{
+        padding:3px;
+        margin:2px;
+        color:black;
+        text-decoration:none
+    }
+    .active_page{
+        background:darkblue;
+        color:white !important;
+    }
+</style>
+<body class="gray-bg">
+<input type='hidden' id='current_page' />
+<input type='hidden' id='show_per_page' />
+<div class="col-md-12" id="content">
+    <div class="ibox float-e-margins">
+        <form class="form-horizontal m-t" id="FindForm">
+            <div class="form-group">
+                <label class="col-sm-1 control-label">查询条件：</label>
+                <input type="text" class="col-sm-3 laydate-icon layer-date form-control"
+                       id="beginTime" name="beginTime"
+                       placeholder="开始时间"
+                       onclick="laydate({istime: true, format: 'YYYY-MM-DD'})"
+                       style="background-color: #fff;" readonly="readonly"/>
+                <input type="text" class="col-sm-3 laydate-icon layer-date form-control"
+                       id="endTime" name="endTime"
+                       placeholder="结束时间"
+                       onclick="laydate({istime: true, format: 'YYYY-MM-DD'})"
+                       style="background-color: #fff;" readonly="readonly"/>
+                <button class="btn btn-success" onclick="reLoad()" type="button">查询</button>
+            </div>
+        </form>
+    </div>
+    <table id="conversation" class="table table-striped" border-width="0 0 1px 0"
+           border-style="solid" border-color="black">
+        <thead>
+        <tr>
+            <th>班次ID</th>
+            <th>分拣开始时间</th>
+            <th>分拣结束时间</th>
+            <th>1分钟瞬间峰值</th>
+            <th>60分钟连续峰值</th>
+            <th>分拣效率</th>
+            <th>分拣总量</th>
+            <th>有效分拣率</th>
+            <th>未分配滑槽1比率</th>
+            <th>最大再循环2比率</th>
+            <th>锁格3比率</th>
+            <th>VCS操作超时7比率</th>
+            <th>VCS排队超时8比率</th>
+            <th>VCS补码拒绝9比率</th>
+            <th>补码关闭12比率</th>
+            <th>重复分拣13比率</th>
+        </tr>
+        </thead>
+        <tbody id="Statistics"></tbody>
+    </table>
+</div>
+<div id='page_navigation'></div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.css}" rel="stylesheet"/>
+    <!-- bootstrap-table 表格插件样式 -->
+    <link th:href="@{/ajax/libs/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/animate.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <link th:href="@{/ruoyi/css/ry-ui.min.css}" rel="stylesheet"/>
+
+    <script th:src="@{/monitor/base-loading.js}"></script>
+    <script type="text/javascript" th:src='@{/js/jquery.min.js}'></script>
+    <script th:src="@{/js/stomp.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/sockjs.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/paginator.min.js}"></script>
+    <script th:src="@{/monitor/sealmailExamine.js}"></script>
+    <script type="text/javascript">
+        var monitorServer = '[[${monitorServer}]]';
+        var aliasName = '[[${aliasName}]]';
+        var sealmailExamineUrl = '[[${sealmailExamineUrl}]]';
+        var userName = '[[${userName}]]'
+    </script>
+    <style>
+        .alignCenter {
+            text-align: center;
+        }
+
+        .alignRight {
+            text-align: right;
+        }
+    </style>
+    <title>数据分析</title>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-12">
+        <div class="row">
+            <nav th:include="system/monitor/include :: navigation"></nav>
+            <div class="col-sm-12 select-info">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <select name="filter" id="filter">
+                                <option value="-1">重复条码查询</option>
+                                <option value="0">超过最大圈数</option>
+                            </select>
+                        </li>
+                        <li>托盘号：
+                            <input style="width: 133px;" type="text" name="trayId" id="trayId"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm"
+                               onclick="loaddata(1);"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-12 select-table table-striped">
+                <table id="conversation" class="table table-striped" border-width="0 0 1px 0"
+                       border-style="solid" border-color="black">
+                    <thead>
+                    <tr>
+                        <th>货件条码</th>
+                        <th class='alignCenter'>邮件ID</th>
+                        <th class='alignCenter'>供件台</th>
+                        <th class='alignCenter'>供件时间</th>
+                        <th class='alignCenter'>供件方式</th>
+                        <th class='alignCenter'>扫描时间</th>
+                        <th class='alignCenter'>扫描仪号</th>
+                        <th>逻辑格口</th>
+                        <th class='alignRight'>托盘号</th>
+                        <th class='alignCenter'>物理格口</th>
+                        <th class='alignCenter'>落格时间</th>
+                        <th class='alignCenter'>落格</th>
+                        <th class='alignCenter'>异常代码</th>
+                        <th class='alignCenter'>成功</th>
+                        <th class='alignCenter'>留盘</th>
+                        <th class='alignCenter'>拒绝</th>
+                        <th class='alignCenter'>圈数</th>
+                        <th>总包号</th>
+                        <th class='alignCenter'>分层</th>
+                    </tr>
+                    </thead>
+                    <tbody id="sealmails"></tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul class="pagination navbar-right" id="pagination">
+                </ul>
+                <input type="hidden" id="total" runat="server"/>
+                <input type="hidden" id="pageNo" runat="server" value="1"/>
+                <input type="hidden" id="pageSize" runat="server" value="20"/>
+                <input type="hidden" id="pageCount" runat="server" value="20"/>
+                <!--设置最多显示的页码数 可以手动设置 默认为7-->
+                <input type="hidden" id="visiblePages" runat="server" value="7"/>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 底边分页栏代码 -->
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+.hide { display:none;}
+.fl { float:left;}
+.fr { float:right;}
+.clearfix:after { content:" "; display:block; clear:both; height:0; }
+.clearfix { zoom:1; }
+.gray {background-color: #f9f9f9;}
+
+/*头部*/
+.header {padding: 0 35px; height: 75px; background-color: #5081da; color: #fff;}
+.header .logo {margin-top: 10px;}
+.header .welcome {margin-right: 20px; margin-top: 22px;}
+.header .welcome i {margin-right: 12px; display: inline-block; width: 33px; height: 33px; background: url('../images/user_pic.png') no-repeat center; -moz-border-radius: 50%; -webkit-border-radius: 50%; border-radius: 50%; vertical-align: middle;}
+.header .home {margin-top: 20px; *margin-top: 24px; line-height: 33px; height: 33px;}
+.header .home i {position: relative; top: -2px; *top: 0; margin-right: 12px; display: inline-block; width: 16px; height: 16px; background: url('../images/home.png') no-repeat center; vertical-align: middle;}
+.header .home a {color: #fff;}
+/*导航*/
+.nav {padding-left: 125px; height: 36px; background-color: #658eda;}
+.nav ul li a{margin: 0 20px; float: left; display: inline-block; padding: 0 10px; height: 35px; line-height: 35px; -moz-border-radius: 3px 3px 0 0; -webkit-border-radius: 3px 3px 0 0; border-radius: 3px 3px 0 0; color: #fff;}
+.nav ul li.on a{background-color: #fff; color: #658eda;}
+
+/*信息查询部分*/
+.info-title {margin: 100px 0 30px; line-height: 46px; color: #5081da; font-size: 30px; text-align: center;;}
+.info-search {margin: 0 auto; width: 756px; height: auto;}
+.info-search .label-warpper {margin-bottom: 14px; padding-left: 70px;}
+.info-search .label-warpper label {position: relative; margin-right: 40px; display: inline-block; padding: 0 8px; height: 28px; line-height: 28px; font-size: 14px; cursor: pointer; color: #000;}
+.info-search .label-warpper label.active {background-color: #5081da; color: #fff; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;}
+.info-search .label-warpper label.active:before {position: absolute; left: 50%; margin-left: -6px; bottom: -8px; content: ''; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #5081da;}
+.info-search .input-warpper input {float: left; font-size: 24px; cursor: pointer;}
+.info-search .input-warpper input[type='text'] {padding: 0 10px; width: 550px; height: 56px; line-height: 56px; border: 1px solid #5081da;}
+.info-search .input-warpper .search {width: 180px; height: 58px; background-color: #5081da; border: 1px solid #5081da; color: #fff;}
+.info-search .input-warpper .search:hover {background-color: #658eda;}
+
+/*顶部条*/
+.top-bar {padding: 0 42px 0 38px; height: 56px; line-height: 56px; background-color: #fff;}
+.samll-title {font-size: 18px; color: #333;}
+.samll-title i {margin-right: 12px; display: inline-block; width: 28px; height: 28px; background: url('../images/small-title.png') no-repeat center; vertical-align: middle;}
+.top-search .input-warpper {padding-top: 12px;}
+.top-search .input-warpper input {float: left; font-size: 14px; cursor: pointer;}
+.top-search .input-warpper input[type='text'] {padding: 0 10px; width: 180px; height: 30px; line-height: 30px; border: 1px solid #5081da;}
+.top-search .input-warpper .search {width: 72px; height: 32px; background-color: #5081da; border: 1px solid #5081da; color: #fff;}
+.top-search .input-warpper .search:hover {background-color: #658eda;}
+/*结果*/
+.result ul {padding: 0 45px;}
+.result ul li {margin-bottom: 25px; padding-left: 125px; min-height: 115px; position: relative; border-bottom: 1px solid #ccc;}
+.result ul li>img {position: absolute; left: 16px; top: 50%; margin-top: -41px; width: 82px; height: 82px;}
+.result .details {padding: 20px 0;}
+.result .details .name {line-height: 48px; font-size: 24px; color: #5081da;}
+.result .details .others {line-height: 30px;}
+.result .details .others>div {float: left; width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+.result .details .others i {margin-right: 12px; display: inline-block; width: 25px; height: 25px; background-image: url('../images/result.png'); background-repeat: no-repeat; vertical-align: middle;}

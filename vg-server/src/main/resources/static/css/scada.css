@@ -1,0 +1,213 @@
+/*主环*/
+.st00 {
+    stroke: #b0b0b0;
+    fill: #b0b0b0;
+}
+
+/*主环速度*/
+.st01 {
+    stroke: #b0b0b0;
+    fill: #b0b0b0;
+}
+
+/*供件台皮带*/
+.st10 {
+    stroke: #ff6c0d;
+    fill: #c8cace;
+}
+
+/*急停*/
+.st20 {
+    fill: #ffffff;
+    stroke: #797979;
+}
+
+/*马达*/
+.st30 {
+    fill: #ffffff;
+    strock: #232a4f;
+}
+
+/*小车*/
+.st40 {
+    stroke: #edf57e;
+    fill: #edf57e;
+}
+
+/*小车组通讯*/
+.st50 {
+    stroke: #1889ef;
+    fill: #1889ef;
+}
+
+/*供包台通讯*/
+.st602 {
+    stroke: #929292;
+    fill: #929292;
+}
+
+/*OBR通讯*/
+.st70 {
+    stroke: #929292;
+    fill: #929292;
+}
+
+/*格口集包*/
+.st81 {
+    stroke: #444444;
+    fill: #ffffff;
+}
+
+/*锁格按钮*/
+.st82 {
+    stroke: #161e4c;
+    fill: #d0e6f4;
+}
+
+/*主环运行*/
+.st001-1 {
+    stroke: #209907;
+    fill: #209907;
+}
+
+/*主环停止*/
+.st001-0 {
+    stroke: #b0b0b0;
+    fill: #b0b0b0;
+}
+
+/*主环速度正常*/
+.st019-1 {
+    stroke: #209907;
+    fill: #209907;
+}
+
+/*主环速度异常*/
+.st019-1 {
+    stroke: #2F80B9;
+    fill: #2F80B9;
+}
+
+/*供件台皮带运行:1*/
+.st101-1 {
+    stroke: #161e4c;
+    fill: #ff6c0d;
+}
+
+/*供件台皮带停止:0*/
+.st101-0 {
+    stroke: #ff6c0d;
+    fill: #c8cace;
+}
+
+/*供件台皮带故障:1*/
+.st109-1 {
+    stroke: #ff6c0d;
+    fill: #ea260c;
+}
+
+/*供件台皮带无故障:0*/
+.st109-0 {
+    stroke: #ffffff;
+    fill: #00ff00;
+}
+
+/*急停触发:1*/
+.st203-1 {
+    fill: #ffffff;
+    stroke: #ed1c24;
+}
+
+/*急停解除:0*/
+.st203-0 {
+    fill: #ffffff;
+    stroke: #797979;
+}
+
+/*马达无故障:1*/
+.st309-1 {
+    fill: #84ef75;
+    strock: #0e298c;
+}
+
+/*马达故障:0*/
+.st309-0 {
+    /*stroke: #f40b0b;*/
+    /*fill: #f2f27c;*/
+    fill: #84ef75;
+    strock: #0e298c;
+}
+
+/*小车故障:1*/
+.st409-1 {
+    /*stroke: #ff2020;*/
+    /*fill: #cccaca;*/
+    stroke: #edf57e;
+    fill: #edf57e;
+}
+
+/*小车无故障:0*/
+.st409-0 {
+    stroke: #edf57e;
+    fill: #edf57e;
+}
+
+/*小车组通讯状态已连接:1*/
+.st502-1 {
+    stroke: #1f3893;
+    fill: #426fa0;
+}
+
+/*小车组通讯状态未连接:0*/
+.st502-0 {
+    stroke: #f4081f;
+    fill: #f4081f;
+}
+
+/*供包台通讯状态已连接:1*/
+.st602-1 {
+    stroke: #f4960c;
+    fill: #f4960c;
+}
+
+/*供包台通讯状态未连接;0*/
+.st602-0 {
+    stroke: #929292;
+    fill: #929292;
+}
+
+/*OBR通讯状态已连接:1*/
+.st702-1 {
+    stroke: #929292;
+    fill: #929292;
+}
+
+/*OBR通讯状态未连接:0*/
+.st702-0 {
+    stroke: #929292;
+    fill: #929292;
+}
+
+/*格口状态满包:1*/
+.st814-1 {
+    stroke: #f4b049;
+    fill: #f2990a;
+}
+
+/*格口状态未满包:0*/
+.st814-0 {
+    stroke: #444444;
+    fill: #ffffff;
+}
+
+/*格口锁格状态:1*/
+.st825-1 {
+    stroke: #5978ff;
+    fill: #161e4c;
+}
+
+/*格口未锁格状态:0*/
+.st825-0 {
+    stroke: #161e4c;
+    fill: #d0e6f4;
+}

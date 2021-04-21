@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>地图</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <script type="text/javascript" th:src="@{/js/echarts.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/echarts.js}"></script>
+    <style>
+        body, html {
+            padding: 0px;
+            margin: 0px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            /*background: -ms-linear-gradient(top, #FFFFFF, #01AAED); !* IE 10 *!*/
+            /*background: -moz-linear-gradient(top, #b8c4cb, #01AAED); !*火狐*!*/
+            /*background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#b8c4cb), to(#01AAED)); !*谷歌*!*/
+            /*background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#01AAED)); !* Safari 4-5, Chrome 1-9*!*/
+            /*background: -webkit-linear-gradient(top, #fff, #01AAED); !*Safari5.1 Chrome 10+*!*/
+            /*background: -o-linear-gradient(top, #fff, #01AAED); !*Opera 11.10+*!*/
+            background: #f0f2f5 url("/img/bg.svg") repeat scroll 0% 0% / 100% 100%;
+            filter: blur(0px);
+            opacity: 1;
+        }
+
+        #box {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+        }
+
+        #box1 {
+            width: 28.5%;
+            height: 34.5%;
+            position: absolute;
+            top: 3%;
+            left: 2.5%;
+            z-index: 999999;
+        }
+
+        #box2 {
+            width: 28.5%;
+            height: 32.5%;
+            position: absolute;
+            top: 33%;
+            left: 2.5%;
+        }
+
+        #box3 {
+            width: 50%;
+            height: 36.5%;
+            position: absolute;
+            left: 2.5%;
+            top: 65%;
+        }
+
+        #box4 {
+            width: 52.5%;
+            height: 65%;
+            position: absolute;
+            top: 1%;
+            left: 25%;
+            transform: scale(1.25);
+            -moz-transform: scale(1.25);
+            -webkit-transform: scale(1.25);
+        }
+
+        #box5 {
+            /*background-color: rgba(127, 155, 155, 0.4);*/
+            width: 18.5%;
+            height: 25%;
+            position: absolute;
+            top: 3%;
+            right: 2.5%;
+            z-index: 999999;
+            float: right;
+            border-radius: 15px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        #box5 table {
+            width: 95%;
+            height: 95%;
+            margin: 10px;
+            border: 1px solid #7f9b9b;
+            color: #7f9b9b;
+        }
+
+        #box5 table td {
+            text-align: center;
+            border: 1px solid #7f9b9b;
+            font-size: 20px;
+        }
+
+        #box5 table th {
+            font-size: 22px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #7f9b9b;
+        }
+
+        #box6 {
+            width: 20.5%;
+            height: 32.5%;
+            position: absolute;
+            top: 32%;
+            right: 2.5%;
+            z-index: 999999;
+            float: right;
+        }
+
+        #box7 {
+            width: 50%;
+            height: 36.5%;
+            position: absolute;
+            top: 65%;
+            right: 2%;
+            z-index: 999999;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+<div id="box">
+    <div id="box1"></div>
+    <div id="box2"></div>
+    <div id="box3"></div>
+    <div id="box4"></div>
+    <div id="box6"></div>
+    <div id="box7"></div>
+</div>
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-dept-edit" th:object="${dept}">
+			<input name="deptId" type="hidden" th:field="*{deptId}" />
+			<input id="treeId" name="parentId" type="hidden" th:field="*{parentId}" />
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">上级部门：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" id="treeName" onclick="selectDeptTree()" readonly="true" th:field="*{parentName}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">部门名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="deptName" th:field="*{deptName}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">显示排序：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="orderNum" th:field="*{orderNum}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">负责人：</label>
+				<div class="col-sm-8">
+					<select name="leader" id="leader" class="form-control">
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">管理员：</label>
+				<div class="col-sm-8">
+					<select name="administrator" id="administrator" class="form-control"></select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">联系电话：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="phone" th:field="*{phone}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">邮箱：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="email" th:field="*{email}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">部门状态：</label>
+				<div class="col-sm-8">
+					<div class="radio-box" th:each="dict : ${@dict.getType('sys_normal_disable')}">
+						<input type="radio" th:id="${dict.dictCode}" name="status" th:value="${dict.dictValue}" th:field="*{status}">
+						<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="form-control-static col-sm-offset-9">
+					<button type="submit" class="btn btn-primary">提交</button>
+					<button onclick="$.modal.close()" class="btn btn-danger" type="button">关闭</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div th:include="include::footer"></div>
+	<script th:src="@{/ajax/libs/select/select2.js}"></script>
+	<script type="text/javascript" th:inline="javascript">
+		var prefix = ctx + "system/dept"
+
+		$("#administrator").select2({});
+		$("#leader").select2({});
+		var userList = [[${userList}]];
+		var leader = [[${dept.leader}]];
+		var administrator = [[${dept.administrator}]];
+		var str = "<option value='0'>--请选择人员--</option>";
+		for (var i = 0; i < userList.length; i++) {
+			let userId = userList[i].userId;
+			if(userId == leader){
+				str += "<option selected value=" + userList[i].userId + ">" + userList[i].userName + "</option>"
+			}else{
+				str += "<option value=" + userList[i].userId + ">" + userList[i].userName + "</option>"
+			}
+		}
+		$("#leader").html(str);
+		var str2 = "<option value='0'>--请选择人员--</option>";
+		for (var i = 0; i < userList.length; i++) {
+			let userId = userList[i].userId;
+			if(userId == administrator){
+				str2 += "<option selected value=" + userList[i].userId + ">" + userList[i].userName + "</option>"
+			}else{
+				str2 += "<option value=" + userList[i].userId + ">" + userList[i].userName + "</option>"
+			}
+		}
+		$("#administrator").html(str2);
+
+		$("#form-dept-edit").validate({
+			rules:{
+				deptName:{
+					required:true,
+					remote: {
+		                url: prefix + "/checkDeptNameUnique",
+		                type: "post",
+		                dataType: "json",
+		                data: {
+		                	"deptId": function() {
+		                        return $.common.trim($("#deptId").val());
+		                    },
+		        			"deptName": function() {
+		                        return $.common.trim($("#deptName").val());
+		                    }
+		                },
+		                dataFilter: function(data, type) {
+		                	return $.validate.unique(data);
+		                }
+		            }
+				},
+				orderNum:{
+					required:true,
+					digits:true
+				},
+				email:{
+                    email:true,
+        		},
+        		phone:{
+        			isPhone:true,
+        		},
+			},
+			messages: {
+		        "deptName": {
+		            remote: "部门已经存在"
+		        }
+		    },
+			submitHandler:function(form){
+				$.operate.save(prefix + "/edit", $('#form-dept-edit').serialize());
+			}
+		});
+	
+		/*部门管理-修改-选择部门树*/
+		function selectDeptTree() {
+			var deptId = $("#treeId").val();
+		    var url = prefix + "/selectDeptTree/" + deptId;
+		    $.modal.open("选择部门", url, '380', '380');
+		}
+	</script>
+</body>
+</html>

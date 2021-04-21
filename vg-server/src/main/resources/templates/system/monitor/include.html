@@ -1,0 +1,65 @@
+<div class="ibox float-e-margins" th:fragment="navigation">
+    <div class="ibox-content" style="padding:0px;margin:0px;">
+        <nav class="navbar navbar-default" role="navigation" style="margin-bottom:5px;">
+            <div class="container-fluid">
+                <div>
+                    <img th:src="${'/uploads/profile/' + logo}" class="img-circle" height="35" width="35" align="left"
+                         style="margin-top:8px;margin-right: 10px;"/>
+                    <a class="navbar-brand" th:href="${'/system/equip/index/' + id}"
+                       th:text="${deviceName}"></a>
+                </div>
+                <div style="margin-left: 50px;">
+                    <ul class="nav navbar-nav" th:if="${type == 'JCD'}" th:each="menu : ${menus}">
+                        <li class="" th:classappend="${#lists.isEmpty(menu.children)} ? '' : 'dropdown' "
+                            th:id="${menu.pageTageId}" th:if="${menu.pageTageId ne 'scada'}">
+                            <a th:href="${menu.url=='#'?'#':menu.url+'/'+id}" th:if="${#lists.isEmpty(menu.children)}">[[${menu.menuName}]]</a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                               th:if="${!(#lists.isEmpty(menu.children))}">[[${menu.menuName}]]<b
+                                    class="caret"></b></a>
+                            <ul class="" th:classappend="${#lists.isEmpty(menu.children)} ? '' : 'dropdown-menu' ">
+                                <li th:each="cmenu : ${menu.children}" th:id="${cmenu.pageTageId}"><a
+                                        th:href="${cmenu.url +'/'+ id}">[[${cmenu.menuName}]]</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li th:id="${menu.pageTageId}" th:if="${menu.pageTageId eq 'scada'}">
+                            <a href="#" onclick="deviceMonitor();">SCADA</a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav" th:if="${type == 'JZ'}" th:each="menu : ${menus}">
+                        <li class="" th:classappend="${#lists.isEmpty(menu.children)} ? '' : 'dropdown' "
+                            th:id="${menu.pageTageId}"
+                            th:if="${menu.pageTageId ne 'matrix-scada'}">
+                            <a th:href="${menu.url=='#'?'#':menu.url+'/'+id}" th:if="${#lists.isEmpty(menu.children)}">[[${menu.menuName}]]</a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                               th:if="${!(#lists.isEmpty(menu.children))}">[[${menu.menuName}]]<b
+                                    class="caret"></b></a>
+                            <ul class="" th:classappend="${#lists.isEmpty(menu.children)} ? '' : 'dropdown-menu' ">
+                                <li th:each="cmenu : ${menu.children}" th:id="${cmenu.pageTageId}"><a
+                                        th:href="${cmenu.url +'/'+ id}">[[${cmenu.menuName}]]</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li th:id="${menu.pageTageId}" th:if="${menu.pageTageId eq 'matrix-scada'}">
+                            <a href="#" onclick="deviceMonitor();">SCADA</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <script th:src="@{/ruoyi/js/common.js?v=2.3.0}"></script>
+    <script th:src="@{/ruoyi/js/ry-ui.min.js?v=2.3.0}"></script>
+    <script type="text/javascript">
+        var ctx = '[[@{/}]]';
+        function deviceMonitor() {
+            var id = '[[${id}]]';
+            var name = '[[${deviceName}]]';
+            if (this == top) {
+                window.open("/system/scada/" + id);
+            } else {
+                window.open(ctx+'system/scada/to/index/'+id,"_blank","");
+            }
+        }
+    </script>
+</div>

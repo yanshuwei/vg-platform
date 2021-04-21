@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link href="/ajax/libs/iCheck/custom.css" th:href="@{/ajax/libs/iCheck/custom.css}" rel="stylesheet"/>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-user-edit" th:object="${user}">
+        <input name="userId" type="hidden" th:field="*{userId}"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">登录名称：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" readonly="true" th:field="*{loginName}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">部门名称：</label>
+            <div class="col-sm-8">
+                <input type="hidden" id="deptName"
+                       name="deptName" class="form-control" th:value="1"/>
+                <span class="select2 select2-container select2-container--default select2-container--above select2-container--focus"
+                      dir="ltr" style="width: 100%;"><span class="selection"><span
+                        class="select2-selection select2-selection--multiple" style="background-color: inherit"><ul
+                        class="select2-selection__rendered"
+                        id="deptNames">
+                    <li class="select2-selection__choice" th:title="${dept.deptName}"
+                        th:id="${'dept_' + dept.deptId}" th:each="dept,deptStatus:${user.deptList}"><span
+                            class="select2-selection__choice__remove"
+                            th:onclick="${'removeDept(' + dept.deptId + ');'}">×</span>[[${dept.deptName}]]<input
+                            type="hidden" th:value="${dept.deptId}" name="deptIds"/></li>
+                    <li
+                            class="select2-selection__choice" onclick="selectDeptTree();"
+                            style="background-color:#FFFFFF;border-color: #FFFFFF;color: #1c84c6"><span
+                            class="select2-selection__choice__remove" style="color:#1c84c6"><i
+                            class="fa fa-plus"></i></span>选择部门</li>
+                    </ul></span></span></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">用户名称：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="userName" id="userName" th:field="*{userName}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">用户类型：</label>
+            <div class="col-sm-8">
+                <select name="userType" id="userType" class="form-control">
+                    <option value="">--请选择用户类型--</option>
+                    <option value="Platform" th:selected='${user.userType=="Platform"}'>平台级</option>
+                    <option value="Operation" th:selected='${user.userType=="Operation"}'>运行商级</option>
+                    <option value="Supplier" th:selected='${user.userType=="Supplier"}'>供应商级</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" id="roleCheck" style="display: none;">
+            <label class="col-sm-3 control-label">角色：</label>
+            <div class="col-sm-8" id="roleCheckBox">
+                <label th:each="role:${roles}" class="checkbox-inline i-checks" th:if="${role.roleType=='Platform'}">
+                    <input name="roles" th:value="${role.roleId}"
+                           th:text="${role.roleName}" th:checked="${role.flag}" type="checkbox">
+                </label>
+            </div>
+            <div class="col-sm-8" id="roleRadio">
+                <label th:each="role:${roles}" class="checkbox-inline i-checks" th:if="${role.roleType=='Operation'}">
+                    <input name="role" th:value="${role.roleId}"
+                           th:text="${role.roleName}" th:checked="${role.flag}" type="radio">
+                </label>
+            </div>
+            <div class="col-sm-8" id="suprRoleRadio">
+                <label th:each="role:${roles}" class="checkbox-inline i-checks" th:if="${role.roleType=='Supplier'}">
+                    <input name="supRole" th:value="${role.roleId}"
+                           th:text="${role.roleName}" th:checked="${role.flag}" type="radio">
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">邮箱：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="email" id="email" th:field="*{email}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">手机：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="phonenumber" id="phonenumber" th:field="*{phonenumber}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">性别：</label>
+            <div class="col-sm-8">
+                <select id="sex" class="form-control m-b" th:with="type=${@dict.getType('sys_user_sex')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"
+                            th:field="*{sex}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8">
+                <div class="onoffswitch">
+                    <input type="checkbox" th:checked="${user.status == '0' ? true : false}"
+                           class="onoffswitch-checkbox" id="status" name="status">
+                    <label class="onoffswitch-label" for="status">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">岗位：</label>
+            <div class="col-sm-8">
+                <select id="post" name="post" class="form-control select2-hidden-accessible" multiple="">
+                    <option th:each="post:${posts}" th:value="${post.postId}" th:text="${post.postName}"
+                            th:selected="${post.flag}" th:disabled="${post.status == '1'}"></option>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="form-control-static col-sm-offset-9">
+                <button type="submit" class="btn btn-primary">提交</button>
+                <button onclick="$.modal.close()" class="btn btn-danger" type="button">关闭</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/iCheck/icheck.min.js}"></script>
+<script th:src="@{/ajax/libs/select/select2.js}"></script>
+<script>
+    $(window).ready(function () {
+        var userType = $("#userType").val();
+        if (userType == "Platform") {
+            $("#roleRadio").hide();
+            $("#roleRadio :input").attr('disabled', true);
+            $("#suprRoleRadio").hide();
+            $("#suprRoleRadio :input").attr('disabled', true);
+        }
+        if (userType == '') {
+            $("#roleCheck").hide();
+            $("#roleCheckBox").hide();
+            $("#roleCheckBox :input").attr('disabled', true);
+            $("#roleRadio").hide();
+            $("#roleRadio :input").attr('disabled', true);
+            $("#suprRoleRadio").hide();
+            $("#suprRoleRadio :input").attr('disabled', true);
+        } else {
+            $("#roleCheck").show();
+        }
+        if (userType == "Operation") {
+            $("#roleCheckBox").hide();
+            $("#roleCheckBox :input").attr('disabled', true);
+            $("#suprRoleRadio").hide();
+            $("#suprRoleRadio :input").attr('disabled', true);
+        }
+        if (userType == "Supplier") {
+            $("#roleCheckBox").hide();
+            $("#roleCheckBox :input").attr('disabled', true);
+            $("#roleRadio").hide();
+            $("#roleRadio :input").attr('disabled', true);
+        }
+    });
+    $("#userType").on('change', function (e) {
+        var userType = $("#userType").val();
+        if (userType == "Platform") {
+            $("#roleCheck").show();
+            $("#roleCheckBox").show();
+            $("#roleCheckBox :input").removeAttr('disabled');
+            $("#roleRadio").hide();
+            $("#roleRadio :input").attr('disabled', true);
+            $("#suprRoleRadio").hide();
+            $("#suprRoleRadio :input").attr('disabled', true);
+        }
+        if (userType == '') {
+            $("#roleCheck").hide();
+            $("#roleCheckBox").hide();
+            $("#roleCheckBox :input").attr('disabled', true);
+            $("#roleRadio").hide();
+            $("#roleRadio :input").attr('disabled', true);
+            $("#suprRoleRadio").hide();
+            $("#suprRoleRadio :input").attr('disabled', true);
+        }
+        if (userType == "Operation") {
+
+            $("#roleCheck").show();
+            $("#roleCheckBox").hide();
+            $("#roleCheckBox :input").attr('disabled', true);
+            $("#roleRadio").show();
+            $("#roleRadio :input").removeAttr('disabled');
+            $("#suprRoleRadio").hide();
+            $("#suprRoleRadio :input").attr('disabled', true);
+        }
+        if (userType == "Supplier") {
+            $("#roleCheck").show();
+            $("#roleCheckBox").hide();
+            $("#roleCheckBox :input").attr('disabled', true);
+            $("#roleRadio").hide();
+            $("#roleRadio :input").attr('disabled', true);
+            $("#suprRoleRadio").show();
+            $("#suprRoleRadio :input").removeAttr('disabled');
+
+        }
+    });
+    $("#form-user-edit").validate({
+        ignore: "",
+        rules: {
+            userName: {
+                required: true,
+            },
+            userType: {
+                required: true,
+            },
+            deptName: {
+                required: true,
+            },
+            email: {
+                required: true,
+                email: true,
+                remote: {
+                    url: ctx + "system/user/checkEmailUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "userId": function () {
+                            return $("#userId").val();
+                        },
+                        "email": function () {
+                            return $.common.trim($("#email").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+            phonenumber: {
+                required: true,
+                isPhone: true,
+                remote: {
+                    url: ctx + "system/user/checkPhoneUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "userId": function () {
+                            return $("#userId").val();
+                        },
+                        "phonenumber": function () {
+                            return $.common.trim($("#phonenumber").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+        },
+        messages: {
+            "email": {
+                remote: "Email已经存在"
+            },
+            "phonenumber": {
+                remote: "手机号码已经存在"
+            }
+        },
+        submitHandler: function (form) {
+            edit();
+        }
+    });
+
+    function edit() {
+        var userId = $("input[name='userId']").val();
+        var deptId = $("input[name='deptId']").val();
+        var userName = $("input[name='userName']").val();
+        var userType = $("#userType option:selected").val();
+        var email = $("input[name='email']").val();
+        var phonenumber = $("input[name='phonenumber']").val();
+        var sex = $("#sex option:selected").val();
+        var status = $("input[name='status']").is(':checked') == true ? 0 : 1;
+        if (userType == "Platform") {
+            var roleIds = $.form.selectCheckeds("roles");
+        }
+        if (userType == "Operation") {
+            var roleIds = $("input[name='role']:checked").val();
+        }
+        if (userType == "Supplier") {
+            var roleIds = $("input[name='supRole']:checked").val();
+        }
+        var postIds = $.form.selectSelects("post");
+        var deptIds = "";
+        $('input:hidden[name="deptIds"]').each(function (i) {
+            deptIds += (i == 0 ? "" : ",") + $(this).val();
+        });
+
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: ctx + "system/user/edit",
+            data: {
+                "userId": userId,
+                "deptIds": deptIds,
+                "userName": userName,
+                "userType": userType,
+                "email": email,
+                "phonenumber": phonenumber,
+                "sex": sex,
+                "status": status,
+                "roleIds": roleIds,
+                "postIds": postIds
+            },
+            async: false,
+            error: function (request) {
+                $.modal.alertError("系统错误");
+            },
+            success: function (data) {
+                $.operate.saveSuccess(data);
+            }
+        });
+    }
+
+    /*用户管理-修改-选择部门树*/
+    function selectDeptTree() {
+        var treeId = $("#treeId").val();
+        var deptId = treeId == null || treeId == "" ? "100" : treeId;
+        var url = ctx + "system/dept/selectDeptTree/" + deptId;
+        $.modal.open("选择部门", url, '380', '380');
+    }
+
+    /*删除部门*/
+    function removeDept(deptId) {
+        $("#dept_" + deptId).remove();
+        if ($("#deptNames").children().length == 1) {
+            $("#deptName").val("");
+        } else {
+            $("#deptName").val($("#deptNames").children().length - 1);
+        }
+    }
+</script>
+</body>
+</html>

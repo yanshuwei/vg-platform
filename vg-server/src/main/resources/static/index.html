@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="/main.css" rel="stylesheet">
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+<script src="/app.js"></script>
+</head>
+<body>
+				<form class="form-inline">
+					<div class="form-group">
+						<input type="text"
+							id="name" class="select-wrap" placeholder="Your name here...">
+					</div>
+					<button id="send" class="btn btn-default" type="submit">send</button>
+				</form>
+			<div class="col-md-12">
+				<table id="conversation" class="table table-striped">
+					<tbody id="seamails">
+					</tbody>
+				</table>
+			</div>
+</body>
+</html>

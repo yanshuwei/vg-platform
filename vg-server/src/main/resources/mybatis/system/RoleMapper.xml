@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vg.project.system.role.mapper.RoleMapper">
+
+    <resultMap type="Role" id="RoleResult">
+        <id property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleKey" column="role_key"/>
+        <result property="roleSort" column="role_sort"/>
+        <result property="status" column="status"/>
+        <result property="roleType" column="role_type"/>
+        <result property="createType" column="create_type"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectRoleVo">
+        select role_id, role_name, role_key, role_sort, role_type,status, create_type,create_time,remark from sys_role
+    </sql>
+
+    <select id="selectRoleList" parameterType="Role" resultMap="RoleResult">
+        <include refid="selectRoleVo"/>
+        <where>
+            <if test="roleName != null and roleName != ''">
+                AND role_name like concat('%', #{roleName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="roleKey != null and roleKey != ''">
+                AND role_key like concat('%', #{roleKey}, '%')
+            </if>
+            <if test="createBy!=null and createBy!=''">
+                AND create_by=#{createBy}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <if test="roleType!= null and roleType!=''">
+                and role_type=#{roleType}
+            </if>
+            AND create_type=#{createType}
+        </where>
+    </select>
+
+    <select id="selectRolesByUserId" parameterType="Long" resultMap="RoleResult">
+		SELECT r.role_id, r.role_name, r.role_key,r.create_type
+		FROM sys_user u
+			 LEFT JOIN sys_user_role ur ON u.user_id = ur.user_id
+			 LEFT JOIN sys_role r ON ur.role_id = r.role_id
+		WHERE ur.user_id = #{userId}
+	</select>
+
+    <select id="selectRolesAll" resultMap="RoleResult">
+        <include refid="selectRoleVo"/>
+    </select>
+
+    <select id="selectRoleById" parameterType="Long" resultMap="RoleResult">
+        <include refid="selectRoleVo"/>
+        where role_id = #{roleId}
+    </select>
+
+    <select id="checkRoleNameUnique" parameterType="String" resultMap="RoleResult">
+        <include refid="selectRoleVo"/>
+        where role_name=#{roleName}
+    </select>
+
+    <select id="checkRoleKeyUnique" parameterType="String" resultMap="RoleResult">
+        <include refid="selectRoleVo"/>
+        where role_key=#{roleKey}
+    </select>
+
+    <select id="selectOperationRoleList" parameterType="Role" resultMap="RoleResult">
+        select distinct r.role_id, r.role_name, r.role_key, r.role_sort, r.role_type,r.status,
+        r.create_type,r.create_time,r.remark from sys_role r
+        right join sys_role_organization ro on r.role_id=ro.role_id
+        right join sys_role_organization ror on ror.operator_id=ro.operator_id
+        right join sys_user_role ur on ror.role_id=ur.role_id
+        <where>
+            ur.user_id=#{userId} and r.role_type="Operation"
+            <if test="roleName != null and roleName != ''">
+                AND role_name like concat('%', #{roleName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="roleKey != null and roleKey != ''">
+                AND role_key like concat('%', #{roleKey}, '%')
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectSupplierRoleList" parameterType="Role" resultMap="RoleResult">
+        select distinct r.role_id, r.role_name, r.role_key, r.role_sort, r.role_type,r.status,
+        r.create_type,r.create_time,r.remark from sys_role r
+        right join sys_role_organization ro on r.role_id=ro.role_id
+        right join sys_role_organization ror on ror.supplier_code=ro.supplier_code
+        right join sys_user_role ur on ror.role_id=ur.role_id
+        <where>
+            ur.user_id=#{userId} and r.role_type="Supplier"
+            <if test="roleName != null and roleName != ''">
+                AND role_name like concat('%', #{roleName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="roleKey != null and roleKey != ''">
+                AND role_key like concat('%', #{roleKey}, '%')
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+    <select id="selectOtherRoles" parameterType="Role" resultMap="RoleResult">
+        select distinct r.role_id, r.role_name, r.role_key, r.role_sort, r.role_type,r.status,
+        r.create_type,r.create_time,r.remark from sys_role r
+        right join sys_role_organization ro on r.role_id=ro.role_id
+        <if test="operatorId !=null and operatorId !=''">
+            right join sys_role_organization ror on ror.operator_id=ro.operator_id
+        </if>
+        <if test="supplierCode !=null and supplierCode !=''">
+            right join sys_role_organization ror on ror.supplier_code=ro.supplier_code
+        </if>
+        where ror.role_id=#{roleId} and r.role_type=#{roleType} and create_type=0
+    </select>
+
+    <select id="selectRoleName" parameterType="Role" resultType="String">
+		SELECT role_name from sys_role as r LEFT JOIN sys_role_organization as ro on r.role_id=ro.role_id
+		<where>
+            <if test="params.supplierCode != null and params.supplierCode != ''">
+                   and ro.supplier_code=#{params.supplierCode}
+            </if>
+        </where>
+        AND r.create_type=1
+	</select>
+
+    <delete id="deleteRoleById" parameterType="Long">
+ 		delete from sys_role where role_id = #{roleId}
+ 	</delete>
+
+    <delete id="deleteRoleByIds" parameterType="Long">
+        delete from sys_role where role_id in
+        <foreach collection="array" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+    <update id="updateRole" parameterType="Role">
+        update sys_role
+        <set>
+            <if test="roleName != null and roleName != ''">role_name = #{roleName},</if>
+            <if test="roleKey != null and roleKey != ''">role_key = #{roleKey},</if>
+            <if test="roleSort != null and roleSort != ''">role_sort = #{roleSort},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where role_id = #{roleId}
+    </update>
+
+    <insert id="insertRole" parameterType="Role" useGeneratedKeys="true" keyProperty="roleId">
+        insert into sys_role(
+        <if test="roleId != null and roleId != 0">role_id,</if>
+        <if test="roleName != null and roleName != ''">role_name,</if>
+        <if test="roleKey != null and roleKey != ''">role_key,</if>
+        <if test="roleSort != null and roleSort != ''">role_sort,</if>
+        <if test="status != null and status != ''">status,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        <if test="roleType!= null and roleType!= ''">role_type,</if>
+        create_type,
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values(
+        <if test="roleId != null and roleId != 0">#{roleId},</if>
+        <if test="roleName != null and roleName != ''">#{roleName},</if>
+        <if test="roleKey != null and roleKey != ''">#{roleKey},</if>
+        <if test="roleSort != null and roleSort != ''">#{roleSort},</if>
+        <if test="status != null and status != ''">#{status},</if>
+        <if test="remark != null and remark != ''">#{remark},</if>
+        <if test="roleType!= null and roleType!= ''">#{roleType},</if>
+        #{createType},
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+    <select id="selectRolesByProjectId" resultMap="RoleResult" parameterType="Long">
+        <include refid="selectRoleVo"/>
+        where role_id in (select role_id from sys_role_organization where operator_id =
+        (select operator_id from sys_projects where id=#{projectId})) and role_type = 'Operation' and create_type = 1
+    </select>
+</mapper> 

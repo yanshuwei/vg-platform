@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<title>班次分拣量统计</title>
+<head th:include="include :: header"></head>
+<style>
+    .chartDiv > div {
+        float: left;
+        height: 700px;
+    }
+
+    #container {
+        width: 100%;
+
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-12">
+        <div class="row">
+            <script th:src="@{/js/jquery.min.js}"></script>
+            <nav th:include="system/monitor/include :: navigation"></nav>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 select-info">
+                <form id="type-form">
+                    <div class="select-list">
+                        <ul>
+                            <li style="display: none">
+                                <input type="text" name="aliasName" id="aliasName" th:value="${aliasName}"/>
+                            </li>
+                            <li>
+                                班次ID：<input type="text" name="workId" style="width: 50px"
+                                            onkeyup="this.value=this.value.replace(/\D/g,'')"
+                                            onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                            </li>
+                            <li class="select-time">
+                                <label>分拣时间： </label>
+                                <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                       name="params[beginTime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                       name="params[endTime]"/>
+                            </li>
+
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                        class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-success btn-rounded btn-sm" onclick="$.table.exportExcel()"
+                                   shiro:hasPermission="system:sorting:statistics:export"><i class="fa fa-download"></i>&nbsp;导出</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+
+            <!--            <div class="col-sm-12 select-table table-striped chartDiv">-->
+            <!--                <div id="container"></div>-->
+            <!--            </div>-->
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12"
+                 style="width: 100%; border-radius: 6px; margin-top:10px; padding-top: 2px;padding-bottom: 13px;padding-left:0px;;padding-right:0px;box-shadow:rgba(0,0,0,.2);">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>分拣效率趋势图</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link"><i class="fa fa-times"></i></a>
+                        </div>
+                    </div>
+                    <div class="ibox-content" id="container" style="width:100%; height: 600px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12"
+                 style="width: 100%; border-radius: 6px; margin-top:10px; padding-top: 2px;padding-bottom: 13px;padding-left:0px;;padding-right:0px;box-shadow:rgba(0,0,0,.2);">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>分拣异常趋势图</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link"><i class="fa fa-times"></i></a>
+                        </div>
+                    </div>
+                    <div class="ibox-content" id="container3" style="width:100%; height: 600px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12"
+                 style="width: 100%; border-radius: 6px; margin-top:10px; padding-top: 2px;padding-bottom: 13px;padding-left:0px;;padding-right:0px;box-shadow:rgba(0,0,0,.2);">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>分拣总量/效率图</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link"><i class="fa fa-times"></i></a>
+                        </div>
+                    </div>
+                    <div class="ibox-content" id="container2" style="width:100%; height: 600px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div th:include="include :: footer"></div>
+<script type="text/javascript" th:src='@{/js/echarts.min.js}'></script>
+<script th:inline="javascript">
+    $("#history-data").addClass("active");
+    $("#worksorting-statistics").addClass("active");
+
+    var prefix = ctx + "system/sorting/statistics";
+
+    $(".modal").appendTo("body"), $("[data-toggle=popover]").popover(), $(".collapse-link").click(function () {
+        var div_ibox = $(this).closest("div.ibox"),
+            e = $(this).find("i"),
+            i = div_ibox.find("div.ibox-content");
+        i.slideToggle(200),
+            e.toggleClass("fa-chevron-up").toggleClass("fa-chevron-down"),
+            div_ibox.toggleClass("").toggleClass("border-bottom"),
+            setTimeout(function () {
+                div_ibox.resize();
+            }, 50);
+    }), $(".close-link").click(function () {
+        var div_ibox = $(this).closest("div.ibox");
+        div_ibox.remove()
+    });
+    var tableDatas;
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            exportUrl: prefix + "/export",
+            queryParams: queryParams,
+            sortName: "workid",
+            sortOrder: "desc",
+            modalName: "数据",
+            search: false,
+            showExport: true,
+            columns: [
+                {
+                    field: 'workId',
+                    title: '班次ID',
+                    align: 'center'
+                },
+                {
+                    field: 'sortStartTime',
+                    title: '分拣开始时间',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return changeDateFormat(value)
+                    }
+                },
+                {
+                    field: 'sortEndTime',
+                    title: '分拣结束时间',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return changeDateFormat(value);
+                    }
+                },
+                {
+                    field: 'sortTotalNum',
+                    title: '分拣总量',
+                    align: 'center'
+                },
+                {
+                    field: 'successTotalNum',
+                    title: '有效分拣率',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+                {
+                    field: 'sortEfficiency',
+                    title: '落格及时率',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return "<a href='/system/sorting/efficiency/detail/" + $("#aliasName").val() + "/" + row.workId + "'>" + value + "</a>";
+                    }
+                },
+                {
+                    field: 'hourMaxValue',
+                    title: '1分钟瞬间峰值',
+                    align: 'center'
+                },
+                {
+                    field: 'hourMaxValue2',
+                    title: '60分钟连续峰值',
+                    align: 'center'
+                },
+//                {
+//                    field: 'maxValueStartTime',
+//                    title: '连续60分钟峰值开始时间',
+//                    align: 'center'
+//                },
+                {
+                    field: 'overFlow1Num',
+                    title: '无物理格口1',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+                {
+                    field: 'overFlow2Num',
+                    title: '最大再循环2',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+                {
+                    field: 'overFlow3Num',
+                    title: '锁格3',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+                {
+                    field: 'overFlow4Num',
+                    title: '多条码4',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+                {
+                    field: 'overFlow5Num',
+                    title: '无信息5',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+                {
+                    field: 'overFlow6Num',
+                    title: '无读6',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+//                {
+//                    field: 'overFlow7Num',
+//                    title: 'VCS操作超时7件数',
+//                    align: 'center'
+//                },
+//                {
+//                    field: 'overFlow8Num',
+//                    title: 'VCS排队超时8件数',
+//                    align: 'center'
+//                },
+//                {
+//                    field: 'overFlow9Num',
+//                    title: 'VCS补码拒绝9件数',
+//                    align: 'center'
+//                },
+                {
+                    field: 'overFlow10Num',
+                    title: '条码拒绝10',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                },
+//                {
+//                    field: 'overFlow11Num',
+//                    title: 'MES拒绝11件数',
+//                    align: 'center'
+//                },
+//                {
+//                    field: 'overFlow12Num',
+//                    title: '补码功能关闭12件数',
+//                    align: 'center'
+//                },
+                {
+                    field: 'overFlow13Num',
+                    title: '重复分拣13',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return eval((value / (row.sortTotalNum == 0 ? 1 : row.sortTotalNum)) * 100).toFixed(1) + "%";
+                    }
+                }
+//                ,
+//                {
+//                    field: 'areaCd',
+//                    title: '区域代码',
+//                    align: 'center'
+//                }
+            ]
+        };
+        $.table.init(options);
+    });
+
+    //修改——转换日期格式(时间戳转换为datetime格式)
+    function changeDateFormat(cellval) {
+        if (cellval != null) {
+            var d = new Date(cellval);
+            var times = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes();
+            return times;
+        } else {
+            return cellval;
+        }
+    }
+
+    function queryParams(params) {
+        return {
+            workId: $("#workId").val() == '' ? undefined : $("#workId").val(),
+            aliasName: $("#aliasName").val(),
+            pageSize: params.limit,
+            pageNum: params.offset / params.limit + 1,
+            searchValue: params.search,
+            orderByColumn: params.sort,
+            isAsc: params.order
+        };
+    }
+
+
+    $('#bootstrap-table').on('load-success.bs.table', function (data) {
+        tableDatas = $('#bootstrap-table').bootstrapTable('getData');//当前页的数据
+        initChart(tableDatas);
+        initTotalChart(tableDatas);
+        initOverFlowChart(tableDatas);
+        console.log(tableDatas);
+    });
+
+    function initChart(data) {
+        var xAxis = new Array(data.length);
+
+        for (var i = 0; i < data.length; i++) {
+            xAxis[data.length - 1 - i] = data[i].sortStartTime;
+        }
+        var option = {
+
+            tooltip: {//提示框，鼠标悬浮交互时的信息提示，每个图表最多仅有一个提示框。
+                trigger: "axis",
+
+                formatter: function (params, ticket, callback) {
+                    console.log(params);
+                    var workData = data.map(function (item) {
+                        if (item.sortStartTime.indexOf(params[0].name) == 0) {
+                            return item;
+                        }
+                    }).filter(Boolean);
+                    //'<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#91c7ae"></span>'
+                    var point = '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:';
+                    var str = "班次:" + workData[0].workId + '<br />分拣开始时间：' + workData[0].sortStartTime + '<br />分拣结束时间：' + workData[0].sortEndTime;
+                    for (var i = 0; i < params.length; i++) {
+                        str = str + "<br />" + point + params[i].color + '"></span>' + params[i].seriesName + "：" + params[i].value + "%";
+                    }
+                    return str;
+
+                }
+
+            },
+            calculable: true,
+            legend: {//图例
+                data: ["落格及时率", "有效分拣效率"],
+                y: 50,    //延Y轴居中
+                x: 'center' //居右显示
+            },
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                splitLine: {show: false},//去除网格线
+                splitArea: {show: false},//保留网格区域
+                data: xAxis,
+                axisLabel: {
+                    interval: 0,
+                    rotate: 70
+                },
+                axisLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#333333',//左边线的颜色
+                        width: '2'//坐标线的宽度
+                    }
+                }
+            }],
+            yAxis: [
+                {
+                    type: 'value',
+                    splitLine: {show: false},//去除网格线
+                    splitArea: {show: false},//保留网格区域
+                    splitNumber: 20,//坐标轴的分割段数
+                    axisLabel: {
+                        formatter: '{value} %'
+                    }, axisLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#333333',//左边线的颜色
+                        width: '1'//坐标线的宽度
+                    }
+                }
+                }
+            ],
+            series: serie_func(data),
+
+            grid: {
+                top: '20%',
+                bottom: '20%',//grid 组件离容器下侧的距离。
+                left: '1%',
+                right: '1%',
+                containLabel: true//grid 区域是否包含坐标轴的刻度标签。
+            }
+
+        };
+
+        var dom = document.getElementById("container");
+        var myChart = echarts.init(dom);
+
+        myChart.setOption(option);
+
+
+    }
+    function serie_func(tableData) {
+        var sortEfficiencys = [];
+        var successTotalNums = [];
+
+
+        for (var i = 0; i < tableData.length; i++) {
+            sortEfficiencys[tableData.length - 1 - i] = tableData[i].sortEfficiency.replace('%', '');
+            successTotalNums[tableData.length - 1 - i] = ((tableData[i].successTotalNum / (tableData[i].sortTotalNum == 0 ? 1 : tableData[i].sortTotalNum)) * 100).toFixed(1);
+        }
+        var serie = [{
+            name: "落格及时率",
+            type: 'line',
+            data: sortEfficiencys
+        }, {
+            name: "有效分拣效率",
+            type: 'line',
+            data: successTotalNums
+        }
+        ];
+
+        return serie;
+    }
+    function initTotalChart(data) {
+        var xAxis = new Array(data.length);
+        var total = [];
+        var hourMax = [];
+
+        for (var i = 0; i < data.length; i++) {
+            xAxis[data.length - 1 - i] = data[i].sortStartTime;
+            total[data.length - 1 - i] = data[i].sortTotalNum;
+            hourMax[data.length - 1 - i] = data[i].hourMaxValue2;
+        }
+        var option = {
+
+            tooltip: {//提示框，鼠标悬浮交互时的信息提示，每个图表最多仅有一个提示框。
+                trigger: "axis",
+
+                formatter: function (params, ticket, callback) {
+                    console.log(params);
+                    var workData = data.map(function (item) {
+                        if (item.sortStartTime.indexOf(params[0].name) == 0) {
+                            return item;
+                        }
+                    }).filter(Boolean);
+                    //'<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#91c7ae"></span>'
+                    var point = '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:';
+                    var str = "班次:" + workData[0].workId + '<br />分拣开始时间：' + workData[0].sortStartTime + '<br />分拣结束时间：' + workData[0].sortEndTime
+                    for (var i = 0; i < params.length; i++) {
+                        str = str + "<br />" + point + params[i].color + '"></span>' + params[i].seriesName + "：" + params[i].value + "件";
+                    }
+                    return str;
+
+                }
+
+            },
+            calculable: true,
+            legend: {//图例
+                data: ["分拣总量", "60分钟连续峰值"],
+                y: 50,    //延Y轴居中
+                x: 'center' //居右显示
+            },
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                splitLine: {show: false},//去除网格线
+                splitArea: {show: false},//保留网格区域
+                data: xAxis,
+                axisLabel: {
+                    interval: 0,
+                    rotate: 70
+                },
+                axisLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#333333',//左边线的颜色
+                        width: '2'//坐标线的宽度
+                    }
+                }
+            }],
+            yAxis: [
+                {
+                    type: 'value',
+                    splitLine: {show: false},//去除网格线
+                    splitArea: {show: false},//保留网格区域
+                    splitNumber: 5,//坐标轴的分割段数
+                    axisLabel: {
+                        formatter: '{value} 件'
+                    }, axisLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#333333',//左边线的颜色
+                        width: '1'//坐标线的宽度
+                    }
+                }
+                }
+            ],
+            series: [{
+                name: "分拣总量",
+                type: 'line',
+                color: ['blue'],
+                data: total
+            }, {
+                name: "60分钟连续峰值",
+                type: 'line',
+                color: ['red'],
+                data: hourMax
+            }],
+
+            grid: {
+                top: '20%',
+                bottom: '20%',//grid 组件离容器下侧的距离。
+                left: '1%',
+                right: '1%',
+                containLabel: true//grid 区域是否包含坐标轴的刻度标签。
+            }
+
+        };
+
+        var dom = document.getElementById("container2");
+        var myChart = echarts.init(dom);
+
+        myChart.setOption(option);
+
+
+    }
+
+    function initOverFlowChart(data) {
+        var xAxis = new Array(data.length);
+        var overFlow1Rate = [];//无物理格口1比率
+        var overFlow2Rate = [];//最大再循环2比率
+        var overFlow3Rate = [];//锁格3件数比率
+        var overFlow4Rate = []//多条码4比率
+        var overFlow5Rate = []//无信息5比率
+        var overFlow6Rate = []//无读6比率
+        var overFlow10Rate = []//条码拒绝10
+        var overFlow13Rate = []//重复分拣13
+
+
+        for (var i = 0; i < data.length; i++) {
+            xAxis[data.length - 1 - i] = data[i].sortStartTime;
+            overFlow1Rate[data.length - 1 - i] = ((data[i].overFlow1Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+            overFlow2Rate[data.length - 1 - i] = ((data[i].overFlow2Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+            overFlow3Rate[data.length - 1 - i] = ((data[i].overFlow3Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+            overFlow4Rate[data.length - 1 - i] = ((data[i].overFlow4Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+            overFlow5Rate[data.length - 1 - i] = ((data[i].overFlow5Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+            overFlow6Rate[data.length - 1 - i] = ((data[i].overFlow6Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+            overFlow10Rate[data.length - 1 - i] = ((data[i].overFlow10Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+            overFlow13Rate[data.length - 1 - i] = ((data[i].overFlow13Num / (data[i].sortTotalNum == 0 ? 1 : data[i].sortTotalNum)) * 100).toFixed(1);
+        }
+        var option = {
+
+            tooltip: {//提示框，鼠标悬浮交互时的信息提示，每个图表最多仅有一个提示框。
+                trigger: "axis",
+
+                formatter: function (params, ticket, callback) {
+                    console.log(params);
+                    var workData = data.map(function (item) {
+                        if (item.sortStartTime.indexOf(params[0].name) == 0) {
+                            return item;
+                        }
+                    }).filter(Boolean);
+                    //'<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#91c7ae"></span>'
+                    var point = '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:';
+                    var str = "班次:" + workData[0].workId + '<br />分拣开始时间：' + workData[0].sortStartTime + '<br />分拣结束时间：' + workData[0].sortEndTime
+                    for (var i = 0; i < params.length; i++) {
+                        str = str + "<br />" + point + params[i].color + '"></span>' + params[i].seriesName + "：" + params[i].value + "%";
+                    }
+                    return str;
+
+                }
+
+            },
+            calculable: true,
+            legend: {//图例
+                data: ["无物理格口1比率", "最大再循环2比率", "锁格3件数比率", "多条码4比率", "无信息5比率", "无读6比率", "条码拒绝10比率", "重复分拣13比率"],
+                y: 50,    //延Y轴居中
+                x: 'center' //居右显示
+            },
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                splitLine: {show: false},//去除网格线
+                splitArea: {show: false},//保留网格区域
+                data: xAxis,
+                axisLabel: {
+                    interval: 0,
+                    rotate: 70
+                },
+                axisLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#333333',//左边线的颜色
+                        width: '2'//坐标线的宽度
+                    }
+                }
+            }],
+            yAxis: [
+                {
+                    type: 'value',
+                    splitLine: {show: false},//去除网格线
+                    splitArea: {show: false},//保留网格区域
+                    splitNumber: 5,//坐标轴的分割段数
+                    axisLabel: {
+                        formatter: '{value} %'
+                    }, axisLine: {
+                    lineStyle: {
+                        type: 'solid',
+                        color: '#333333',//左边线的颜色
+                        width: '1'//坐标线的宽度
+                    }
+                }
+                }
+            ],
+            series: [{
+                name: "无物理格口1比率",
+                type: 'line',
+                data: overFlow1Rate
+            }, {
+                name: "最大再循环2比率",
+                type: 'line',
+                data: overFlow2Rate
+            }, {
+                name: "锁格3件数比率",
+                type: 'line',
+                data: overFlow3Rate
+            }, {
+                name: "多条码4比率",
+                type: 'line',
+                data: overFlow4Rate
+            }, {
+                name: "无信息5比率",
+                type: 'line',
+                data: overFlow5Rate
+            }, {
+                name: "无读6比率",
+                type: 'line',
+                data: overFlow6Rate
+            }, {
+                name: "条码拒绝10比率",
+                type: 'line',
+                data: overFlow10Rate
+            }, {
+                name: "重复分拣13比率",
+                type: 'line',
+                data: overFlow13Rate
+            }],
+
+            grid: {
+                top: '20%',
+                bottom: '20%',//grid 组件离容器下侧的距离。
+                left: '1%',
+                right: '1%',
+                containLabel: true//grid 区域是否包含坐标轴的刻度标签。
+            }
+
+        };
+
+        var dom = document.getElementById("container3");
+        var myChart = echarts.init(dom);
+
+        myChart.setOption(option);
+
+
+    }
+
+</script>
+</body>
+</html>

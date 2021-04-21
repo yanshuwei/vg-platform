@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.css}" rel="stylesheet"/>
+    <!-- bootstrap-table 表格插件样式 -->
+    <link th:href="@{/ajax/libs/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/animate.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <link th:href="@{/ruoyi/css/ry-ui.min.css}" rel="stylesheet"/>
+
+    <script th:src="@{/monitor/base-loading.js}"></script>
+    <script type="text/javascript" th:src='@{/js/jquery.min.js}'></script>
+    <script th:src="@{/js/stomp.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/sockjs.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/paginator.min.js}"></script>
+    <script th:src="@{/ajax/libs/layui/layui.js}"></script>
+    <script th:src="@{/monitor/matrix/sealmailSearch.js}"></script>
+    <script type="text/javascript">
+        var monitorServer = '[[${monitorServer}]]';
+        var aliasName = '[[${aliasName}]]';
+        var matrixSealmailSearchUrl = '[[${matrixSealmailSearchUrl}]]';
+        var userName =  '[[${userName}]]'
+    </script>
+    <style>
+        .alignCenter{
+            text-align: center;
+        }
+        .alignRight{
+            text-align: right;
+        }
+    </style>
+    <title>分拣数据查询</title>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-12">
+        <div class="row">
+            <nav th:include="system/monitor/include :: navigation"></nav>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 select-info">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            条码：<input type="text" name="barcode" id="barcode" style="width:200px;"/>
+                        </li>
+                        <li>
+                            逻辑格口：<input type="text" name="lchute" id="lchute" style="width: 200px;"/>
+                        </li>
+                        <li>
+                            一级分拣线No：<input type="text" name="lineNo1" id="lineNo1" style="width: 40px;"/>
+                        </li>
+                        <li>
+                            一级实际物理格口：<input type="text" name="actualChute1" id="actualChute1" style="width: 40px;"/>
+                        </li>
+                        <li class="select-time">
+                            <label>一级起始时间： </label><input type="text" id="startTime" class="time-input"
+                                                          placeholder="示例：2019-06-16 12:30:15"
+                                                          name="params[startTime]"/>
+                        </li>
+                        <li class="select-time">
+                            <label>一级终止时间： </label><input type="text" id="endTime" class="time-input"
+                                                          placeholder="示例：2019-06-18 12:30:15" name="params[endTime]"/>
+                        </li>
+                        <li>
+                            历史：<input type="checkbox" name="isHis" id="isHis"
+                                      style="width:25px;vertical-align:middle;margin:0px;"/>
+                        </li>
+                        <li>
+                            班次ID：<input type="text" name="workId" id="workId" style="width:50px;"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm"
+                               onclick="loaddata(1);"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-12 select-table table-striped">
+                <table id="conversation" class="table table-striped" border-width="0 0 1px 0"
+                       border-style="solid" border-color="black">
+                    <thead>
+                    <tr>
+                        <th>条码</th>
+                        <th class="alignRight">逻辑格口</th>
+                        <th class="alignRight">一级分拣线No</th>
+                        <th class="alignCenter">一级扫描时间</th>
+                        <th class="alignRight">一级预定物理格口</th>
+                        <th class="alignRight">一级实际物理格口</th>
+                        <th class="alignCenter">错误代码</th>
+                        <th class="alignRight">二级分拣线No</th>
+                        <th class="alignRight">班次</th>
+                    </tr>
+                    </thead>
+                    <tbody id="sealmails"></tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul class="pagination navbar-right" id="pagination">
+                </ul>
+                <input type="hidden" id="total" runat="server"/>
+                <input type="hidden" id="pageNo" runat="server" value="1"/>
+                <input type="hidden" id="pageSize" runat="server" value="20"/>
+                <input type="hidden" id="pageCount" runat="server" value="20"/>
+                <!--设置最多显示的页码数 可以手动设置 默认为7-->
+                <input type="hidden" id="visiblePages" runat="server" value="7"/>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+</body>
+</html>
