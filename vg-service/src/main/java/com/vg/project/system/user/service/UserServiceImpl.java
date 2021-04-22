@@ -158,7 +158,6 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public int insertUser(User user) {
-        String content = "<html><body>" + user.getUserName() + ":您好!<p style=\"text-indent:2em;\">您的金峰云账号已开通!</p><p style=\"text-indent:2em;\">登录账号为：" + user.getLoginName() + "</p><p style=\"text-indent:2em;\">初始密码为：" + user.getPassword() + "</p><p style=\"text-indent:2em;\">角色：";
         user.randomSalt();
         user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
         user.setCreateBy(ShiroUtils.getLoginName());
@@ -219,8 +218,6 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public int resetUserPwd(User user) {
-        String content = "<html><body><div style=\"font-size:14px;\">" +
-                user.getUserName() + "，您好！</div><div style=\"font-size:14px;margin-top:10px;text-indent:2em;\">您的金峰云登录账号为：" + user.getLoginName() + "  登录密码已重置为：" + user.getPassword() + "   为了您的账号安全，请登录后重新设置密码。</div>";
         user.randomSalt();
         user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
         return updateUserInfo(user);
