@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="log.path" value="E:/Workspace/gp-cms/logs/vg"/>
+    <property name="log.path" value="D:/WorkSpace/1_github/vg-platform/logs/vg"/>
     <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}-%msg%n"/>
 
     <!-- 控制台输出 -->
