@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vg.project.note.record.mapper.RecordMapper">
+    
+    <resultMap type="Record" id="RecordResult">
+        <result property="id"    column="ID"    />
+        <result property="remark"    column="REMARK"    />
+        <result property="money"    column="MONEY"    />
+        <result property="date"    column="DATE"    />
+        <result property="week"    column="WEEK"    />
+        <result property="kind"    column="KIND"    />
+        <result property="quality"    column="QUALITY"    />
+        <result property="userId"    column="USERID"    />
+        <result property="createTime"    column="CREATE_TIME"    />
+        <result property="updateTime"    column="UPDATE_TIME"    />
+        <result property="icon"    column="ICON"    />
+    </resultMap>
+	
+	<sql id="selectRecordVo">
+        select ID,REMARK, MONEY, DATE, WEEK, quality, KIND, USERID, CREATE_TIME, UPDATE_TIME from t_record
+    </sql>
+	
+    <select id="selectRecordList" parameterType="Record" resultMap="RecordResult">
+        <include refid="selectRecordVo"/>
+        <where>  
+            <if test="id != null and id != ''"> and ID = #{id}</if>
+             <if test="money != null"> and MONEY = #{money}</if>
+             <if test="remark != null and remark != ''"> and REMARK = #{money}</if>
+             <if test="date != null and date != ''"> and DATE = #{date}</if>
+             <if test="week != null and week != ''"> and WEEK = #{week}</if>
+             <if test="quality != null and quality != ''"> and quality = #{quality}</if>
+             <if test="kind != null and kind != ''"> and KIND = #{kind}</if>
+             <if test="userId != null and userId != ''"> and USERID = #{userId}</if>
+             <if test="createTime != null and createTime != ''"> and CREATE_TIME = #{createTime}</if>
+             <if test="updateTime != null and updateTime != ''"> and UPDATE_TIME = #{updateTime}</if>
+         </where>
+    </select>
+
+    <select id="selectRecordListCascade" parameterType="Record" resultMap="RecordResult">
+        SELECT t.*,s.ICON FROM t_record t left join t_record_type s on t.kind = s.kind
+        <where>
+            <if test="userId != null "> and t.USERID = #{userId}</if>
+            <if test="date != null and date != ''"> and t.date like #{date}</if>
+        </where>
+        order by date desc
+    </select>
+
+    <select id="selectRecordById" parameterType="Integer" resultMap="RecordResult">
+        <include refid="selectRecordVo"/>
+        where ID = #{id}
+    </select>
+        
+    <insert id="insertRecord" parameterType="Record">
+        insert into t_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null and id != '' ">ID,</if>
+            <if test="remark != null and remark != '' ">REMARK,</if>
+            <if test="money != null">MONEY,</if>
+			<if test="date != null and date != '' ">DATE,</if>
+			<if test="week != null and week != '' ">WEEK,</if>
+			<if test="kind != null and kind != '' ">KIND,</if>
+            <if test="quality != null ">quality,</if>
+            <if test="userId != null and userId != '' ">USERID,</if>
+			CREATE_TIME,
+			<if test="updateTime != null">UPDATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null and id != ''">#{id},</if>
+			<if test="remark != null and remark != ''">#{remark},</if>
+			<if test="money != null">#{money},</if>
+			<if test="date != null and date != ''">#{date},</if>
+			<if test="week != null and week != ''">#{week},</if>
+			<if test="kind != null and kind != ''">#{kind},</if>
+            <if test="quality != null">#{quality},</if>
+            <if test="userId != null and userId != ''">#{userId},</if>
+			sysdate(),
+			<if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateRecord" parameterType="Record">
+        update t_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="remark != null and remark != ''  ">REMARK = #{remark},</if>
+            <if test="money != null  ">MONEY = #{money},</if>
+            <if test="date != null  and date != ''  ">DATE = #{date},</if>
+            <if test="week != null  and week != ''  ">WEEK = #{week},</if>
+            <if test="kind != null  ">KIND = #{kind},</if>
+            <if test="quality != null  ">quality = #{quality},</if>
+            <if test="userId != null  ">USERID = #{userId},</if>
+            <if test="createTime != null  ">CREATE_TIME = #{createTime},</if>
+            <if test="updateTime != null  ">UPDATE_TIME = #{updateTime},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+	<delete id="deleteRecordById" parameterType="Integer">
+        delete from t_record where ID = #{id}
+    </delete>
+	
+    <delete id="deleteRecordByIds" parameterType="String">
+        delete from t_record where ID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

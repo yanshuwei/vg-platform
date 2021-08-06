@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vg.project.note.recordType.mapper.RecordTypeMapper">
+    
+    <resultMap type="RecordType" id="RecordTypeResult">
+        <result property="id"    column="ID"    />
+        <result property="name"    column="NAME"    />
+        <result property="kind"    column="KIND"    />
+        <result property="quality"    column="QUALITY"    />
+        <result property="userId"    column="USERID"    />
+        <result property="orderby"    column="orderby"    />
+        <result property="icon"    column="ICON"    />
+        <result property="createTime"    column="CREATE_TIME"    />
+        <result property="updateTime"    column="UPDATE_TIME"    />
+    </resultMap>
+	
+	<sql id="selectRecordTypeVo">
+        select ID, NAME, KIND, quality, USERID, orderby, ICON, CREATE_TIME, UPDATE_TIME from t_record_type
+    </sql>
+	
+    <select id="selectRecordTypeList" parameterType="RecordType" resultMap="RecordTypeResult">
+        <include refid="selectRecordTypeVo"/>
+        <where>  
+            <if test="id != null"> and ID = #{id}</if>
+             <if test="name != null and name != ''"> and NAME = #{name}</if>
+             <if test="kind != null"> and KIND = #{kind}</if>
+             <if test="quality != null"> and quality = #{quality}</if>
+             <if test="userId != null and userId != ''"> and USERID = #{userId}</if>
+             <if test="orderby != null and orderby != ''"> and 'orderby' = #{orderby}</if>
+             <if test="icon != null and icon != ''"> and ICON = #{icon}</if>
+             <if test="createTime != null and createTime != ''"> and CREATE_TIME = #{createTime}</if>
+             <if test="updateTime != null and updateTime != ''"> and UPDATE_TIME = #{updateTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectRecordTypeById" parameterType="Long" resultMap="RecordTypeResult">
+        <include refid="selectRecordTypeVo"/>
+        where ID = #{id}
+    </select>
+        
+    <insert id="insertRecordType" parameterType="RecordType">
+        insert into t_record_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null and id != '' ">ID,</if>
+			<if test="name != null and name != '' ">NAME,</if>
+			<if test="kind != null">KIND,</if>
+			<if test="quality != null ">QUALITY,</if>
+			<if test="userId != null and userId != '' ">USERID,</if>
+			<if test="orderby != null and orderby != '' ">orderby,</if>
+			<if test="icon != null and icon != '' ">ICON,</if>
+			CREATE_TIME,
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null and id != ''">#{id},</if>
+			<if test="name != null and name != ''">#{name},</if>
+			<if test="kind != null and kind != ''">#{kind},</if>
+			<if test="quality != null">#{quality},</if>
+			<if test="userId != null and userId != ''">#{userId},</if>
+			<if test="orderby != null and orderby != ''">#{orderby},</if>
+			<if test="icon != null and icon != ''">#{icon},</if>
+			sysdate(),
+         </trim>
+    </insert>
+	 
+    <update id="updateRecordType" parameterType="RecordType">
+        update t_record_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''  ">NAME = #{name},</if>
+            <if test="kind != null  ">KIND = #{kind},</if>
+            <if test="quality != null  ">quality = #{quality},</if>
+            <if test="userId != null  ">USERID = #{userId},</if>
+            <if test="orderby != null  ">orderby = #{orderby},</if>
+            <if test="icon != null  and icon != ''  ">ICON = #{icon},</if>
+            UPDATE_TIME = sysdate(),
+        </trim>
+        where ID = #{id}
+    </update>
+
+	<delete id="deleteRecordTypeById" parameterType="Long">
+        delete from t_record_type where ID = #{id}
+    </delete>
+	
+    <delete id="deleteRecordTypeByIds" parameterType="String">
+        delete from t_record_type where ID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

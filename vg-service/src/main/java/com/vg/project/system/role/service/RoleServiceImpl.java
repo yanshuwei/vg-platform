@@ -237,7 +237,7 @@ public class RoleServiceImpl implements IRoleService {
      */
     @Override
     public int updateRole(Role role) {
-        User user = ShiroUtils.getUser();
+       /* User user = ShiroUtils.getUser();
         String userType = user.getUserType();
         if (userType.equals("Platform")) {
             if(role.getRoleType().equals("Operation")){
@@ -303,7 +303,7 @@ public class RoleServiceImpl implements IRoleService {
             roleMenuMapper.deleteRoleMenuByRoleId(role.getRoleId());
             ShiroUtils.clearCachedAuthorizationInfo();
             return insertRoleMenu(role);
-        }
+        }*/
 
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId(role.getRoleId());

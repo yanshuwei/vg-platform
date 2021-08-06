@@ -129,3 +129,7 @@ gen:
   autoRemovePre: true
   # 表前缀(类名不会包含表前缀)
   tablePrefix: sys_
+# 微信小程序
+wx:
+  appid: wx1ee0a27194b30dd4
+  secret: a5ec66c9056dd7c8fc14b660b1862b57

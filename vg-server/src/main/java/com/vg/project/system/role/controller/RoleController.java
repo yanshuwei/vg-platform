@@ -151,17 +151,18 @@ public class RoleController extends BaseController
         User user= ShiroUtils.getUser();
         Long userId=user.getUserId();
         String roleType = user.getUserType();//登录者类型级别
-        if (roleType.equals("Platform")){
+       /* if (roleType.equals("Platform")){
             Role role = roleService.selectRoleById(roleId);
-            role.setSupplierCode(roleOrganizationService.selectSupplierCodeByRoleId(roleId));
+            *//*role.setSupplierCode(roleOrganizationService.selectSupplierCodeByRoleId(roleId));
             mmap.put("role",role);
             if(!role.getRoleType().equals("Supplier")) {
                 mmap.put("operators", null);
-            }
+            }*//*
+            mmap.put("role",role);
             return prefix + "/platform/edit";
-        }
+        }*/
         mmap.put("role", roleService.selectRoleById(roleId));
-        return prefix + "/other/edit";
+        return prefix + "/edit";
     }
 
     /**
